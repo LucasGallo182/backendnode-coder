@@ -1,11 +1,13 @@
 const Contenedor = require('./contenedor.js')
 
+//New Contenedor
 const newContainer = new Contenedor('products.txt')
 
 const globalFunction = async () => {
-    await newContainer.save({ title: 'The Marvel: Spiderman', price: 5000, thumbnail: 'url product'})
-    await newContainer.save({ title: 'Dragon Ball Z: Fighter Z', price: 4200, thumbnail: 'url product'})
-    await newContainer.save({ title: 'The Last Of Us', price: 3800, thumbnail: 'url product'})
+    //Save
+    await newContainer.save({title: 'Dragon Ball Z: Fighter Z', price: 5000, thumbnail: 'https://i.ibb.co/8NyJF70/dbz.jpg'})
+    await newContainer.save({title: 'The Marvel: Spiderman', price: 4500, thumbnail: 'https://i.ibb.co/rm8Bq2g/spiderman.png'})
+    await newContainer.save({title: 'The Last Of Us', price: 3200, thumbnail: 'https://i.ibb.co/kXhSmRP/thelastofus.png'})
 
     //Get by id
     const getId = await newContainer.getById(2)

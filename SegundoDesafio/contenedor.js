@@ -1,95 +1,96 @@
-const fs = require("fs");
+const fs = require('fs')
 
 class Contenedor {
     constructor(filename) {
         this.filename = filename
     }
 
-    //1. Create file
-    async createFile() {
+    //Save(Object)
+    async save(object) {
         try {
-            fs.writeFile(this.filename, '[]', (error) => {
-                error ? console.log(error) : console.log(`File ${this.filename} was succesfully created.`);
-            })
-        }
-        catch (error) {
+            //Generate file
+            if(fs.existsSync(this.filename)) {
+                let info = await fs.promises.readFile(this.filename, 'utf8')
+                let result = JSON.parse(info)
+
+                //If there are one product
+                if (result.length > 0) {
+                    let lastId = result.length + 1
+                    let newProduct = {
+                        id: lastId,
+                        ...object
+                    }
+                    result.push(newProduct)
+                    await fs.promises.writeFile(this.filename, JSON.stringify(result, null, 2))
+                    return lastId
+                } else { //if array empty
+                    let newProduct = {
+                        id: 1,
+                        ...object
+                    }
+                    result.push(newProduct)
+                    await fs.promises.writeFile(this.filename, JSON.stringify(result, null, 2))
+                    return 1
+                }
+            } else {
+                //If filename doesn't exist, add product with id = 1
+                let newProduct = {
+                    id: 1,
+                    ...object
+                }
+                await fs.promises.writeFile(this.filename, JSON.stringify([newProduct], null, 2))
+                return 1
+            }
+        } catch (error) {
             console.log(error)
         }
     }
 
-    //2. Read file
-    async readFile() {
-        const data = await fs.promises.readFile("./products.txt", "utf-8")
-        return data
-    }
-
-    //3. Save(Object)
-    async save(object) {
-        try {
-            const newObject = await this.readFile()
-            const parseObject = JSON.parse(newObject)
-
-            object.id = parseObject.length + 1
-            parseObject.push(object)
-
-            fs.promises.writeFile(this.filename, JSON.stringify(parseObject, null, 2))
-            return object.id
-        }
-        catch(error) {
-            console.log('There was an error when you try to add a product');
-        }
-    }
-
-    //4. getById(Number)
+    //getById(Number)
     async getById(id) {
         try {
-            const newObject = await this.readFile()
-            const parseObject = JSON.parse(newObject)
+            let info = await fs.promises.readFile(this.filename, 'utf8')
+            let result = JSON.parse(info)
 
-            return parseObject.find(product => product.id === id)
-        }
-        catch (error) {
+            return result.find(product => product.id === id)
+        } catch (error) {
             return null
         }
     }
 
-    //5. getAll()
+    //getAll()
     async getAll() {
         try {
-            const newObject = await this.readFile()
-            const parseObject = JSON.parse(newObject)
-            return parseObject
-        }
-        catch (error) {
-            console.log('There was an error when trying to get all products')
-        }
-    }
-
-    //6. deleteById(number)
-    async deleteById(id) {
-        try {
-            const newObject = await this.readFile()
-            const parseObject = JSON.parse(newObject)
-
-            const objectToDelete = parseObject.find(product => product.id === id)
-            if (objectToDelete) {
-                const index = parseObject.indexOf(objectToDelete)
-                parseObject.splice(1, index)
-                await fs.promises.writeFile(this.filename, JSON.stringify(parseObject, null, 2))
-            } else {
-                console.log(`Id ${id} does not exist`)           
-            }
-        }
-        catch (error) {
+            let info = await fs.promises.readFile(this.filename, 'utf8')
+            let result = JSON.parse(info)
+            return result
+        } catch (error) {
             console.log(error)
         }
     }
 
-    //7. deleteAll()
+    //deleteById(number)
+    async deleteById(id) {
+        try {
+            let info = await fs.promises.readFile(this.filename, 'utf8')
+            let result = JSON.parse(info)
+
+            const objectToDelete = result.find(product => product.id === id)
+            if(objectToDelete) {
+                const index = result.indexOf(objectToDelete)
+                result.splice(1, index)
+                await fs.promises.writeFile(this.filename, JSON.stringify(result, null, 2))
+            } else {
+                console.log(`Id ${id} doesn't exists`)
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    //deleteAll()
     async deleteAll() {
-        fs.writeFile(this.filename, '[]', (error) => {
-            error ? console.log(error) : console.log(`All objects from ${this.filename} has been deleted.`);
-        })
+        await fs.promises.writeFile(this.filename, JSON.stringify([]))
     }
 }
 
