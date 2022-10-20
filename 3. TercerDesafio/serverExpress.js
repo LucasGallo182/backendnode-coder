@@ -37,7 +37,7 @@ const getRandomNumber = (minNumber, maxNumber) => {
 
 //Connect Server
 const server = app.listen(PORT, () => {
-    console.log(`Server started at http://localhost:${PORT}`)
+    console.log(`Server started at port: ${server.address().port}`)
 })
 
 //Error
