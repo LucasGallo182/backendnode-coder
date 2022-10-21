@@ -32,7 +32,7 @@ app.get('/productoRandom', async (req, res) => {
 //Random number
 const getRandomNumber = (minNumber, maxNumber) => {
     //Math.random() * (maxNumber - minNumber) + minNumber -> que se encuentre entre esos numeros (max, min)
-    return Math.floor(Math.random() * ((maxNumber + 1) - minNumber)) //Agrego +1 al maxNumber, porque nunca llega al maximo, sino entre el menor y el numero anterior al maximo
+    return Math.floor(Math.random() * ((maxNumber + 1) - minNumber) + minNumber) //Agrego +1 al maxNumber, porque nunca llega al maximo, sino entre el menor y el numero anterior al maximo
 }
 
 //Connect Server
