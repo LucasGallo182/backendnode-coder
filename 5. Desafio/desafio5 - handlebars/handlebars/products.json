@@ -6,7 +6,10 @@
     "thumbnail": "https://i.ibb.co/8NyJF70/dbz.jpg"
   },
   {
-    "id": 2
+    "id": 2,
+    "title": "The Marvel: Spiderman",
+    "price": "4500",
+    "thumbnail": "https://i.ibb.co/rm8Bq2g/spiderman.png"
   },
   {
     "id": 3,
