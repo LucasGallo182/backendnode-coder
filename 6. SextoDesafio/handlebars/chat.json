@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "email": "lucas@lucas.com",
+    "message": "Hola como estas?",
+    "date": "10/11/2022, 0:02:54"
+  },
+  {
+    "id": 2,
+    "email": "lucas.182g@gmail.com",
+    "message": "Bien y vos?",
+    "date": "10/11/2022, 0:03:55"
+  },
+  {
+    "id": 3,
+    "email": "lucas@lucas.com",
+    "message": "Bien, todo tranquilo.",
+    "date": "10/11/2022, 0:04:05"
+  },
+  {
+    "id": 4,
+    "email": "lucas.182g@gmail.com",
+    "message": "Me alegro por ti.",
+    "date": "10/11/2022, 0:04:13"
+  }
+]
