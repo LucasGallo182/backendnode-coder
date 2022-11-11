@@ -128,7 +128,7 @@
       }
     })
 
-    socket.on('list-msg-welcome-act', (data) => {
+    socket.on('send-message-update', (data) => {
       let htmlContent = ''
       data.forEach((msg) => {
         htmlContent += `<small style="display:block"> - <em style="color:brown">[${msg.date}]</em> <strong style="color:#557AE5">${msg.email}</strong>: <span style="color:green; font-style: italic">${msg.message}</span> </small>`
@@ -136,7 +136,7 @@
       })
     })
 
-    socket.on('list-msg-welcome', (data) => {
+    socket.on('send-message', (data) => {
       let htmlContent = ''
       data.forEach((msg) => {
         htmlContent += `<small style="display:block"> - <em style="color:brown">[${msg.date}]</em> <strong style="color:#557AE5">${msg.email}</strong>: <span style="color:green; font-style: italic">${msg.message}</span> </small>`
@@ -144,7 +144,7 @@
       })
     })
 
-    socket.on('list-act', (data) => {
+    socket.on('list-products', (data) => {
       let htmlContent = ''
       data.forEach((prod) => {
         htmlContent +=
@@ -160,7 +160,7 @@
       })
     })
 
-    socket.on('list-welcome', (data) => {
+    socket.on('list-products-update', (data) => {
       let htmlContent = ''
       data.forEach((prod) => {
         htmlContent +=
