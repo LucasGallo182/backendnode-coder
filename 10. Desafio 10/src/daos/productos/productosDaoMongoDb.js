@@ -9,7 +9,7 @@ const productos = new contenedor("products", {
 
 const crud = async () => {
     await config.initMongoDB()
-    //await productos.save({title: "DBZ: Tenkaichi 3", price: 565, thumbnail: "https://i.ibb.co/8NyJF70/dbz.jpg"})
+    await productos.save({title: "DBZ: Tenkaichi 3", price: 565, thumbnail: "https://i.ibb.co/8NyJF70/dbz.jpg"})
     //await productos.getAll()
     //await productos.getById("639787392d55a93df2e44996")
     //await productos.deleteAll()

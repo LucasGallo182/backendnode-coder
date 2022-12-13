@@ -5,7 +5,7 @@ const express = require('express')
 const { Router } = express
 const app = express()
 
-//Set Class
+//Set Class (Desahabilitar p/Firebase-MongoDb)
 const productos = new Contenedor()
 const carrito = new Carrito()
 
