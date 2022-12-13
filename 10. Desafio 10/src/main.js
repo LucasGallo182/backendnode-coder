@@ -1,155 +1,102 @@
-//Express
+//Modules - Class
+const Carrito = require('./daos/carritos/carritoDaoFs')
+const Contenedor = require('./daos/productos/productosDaoFs')
 const express = require('express')
+const { Router } = express
 const app = express()
 
-//JSON
+//Set Class
+const productos = new Contenedor()
+const carrito = new Carrito()
+
+//Routes
+const productosRuta = Router()
+const carritoRuta = Router()
+
+//Admin
+const admin = true
+
 app.use(express.json())
-app.use(express.urlencoded({extended:true}))
+app.use(express.urlencoded({extended: true}))
+app.use('/api/productos', productosRuta)
+app.use('/api/carrito', carritoRuta)
 
-//Container
-const Contenedor = require("./container/container")
-const newProduct = new Contenedor("./src/db/products.json", ["timestamp", "title", "price", "description", "code", "image", "stock"])
-const newCart = new Contenedor("./src/db/cart.json", ["timestamp", "products"])
+const PORT = 8080
 
-//Import routes
-const routeProducts = express.Router()
-const routeCart = express.Router()
-
-//Implement route
-app.use('/api/productos', routeProducts)
-app.use('/api/carrito', routeCart)
-
-//.ENV
-const dotenv = require('dotenv')
-dotenv.config()
-
-const PORT = process.env.PORT || 8080
-
-
-/* Auth Middleware */
-const middlewareAuth = app.use((req, res, next) => {
-    req.header('authorization') == process.env.TOKEN 
-        ? next()
-        : res.status(401).json({"error": "unauthorized route"})
+//Endpoints de productos
+productosRuta.get('/', (req, res) => {
+    productos.getAll().then(response => {
+        res.send(response)
+    })
 })
 
-/* ################## ENDPOINTS ################## */
-// PRODUCTS >>>>>>
-//getAll > api/productos
-routeProducts.get('/', async (req, res) => {
-    const products = await newProduct.getAll()
-    res.status(200).json(products)
+productosRuta.post('/', (req, res) => {
+    const producto = req.body;
+    productos.save(producto)
+    res.send({msj: `Product ${producto.title} has been added`})
 })
 
-//getById > api/productos/:id
-routeProducts.get('/:id', async (req, res) => {
-    const getId = req.params.id
-    const product = await newProduct.getById(getId)
-    product
-        ? res.status(200).json(product)
-        : res.status(400).json({"Error": "Product/s doesn't exist"})
+productosRuta.delete('/:id', (req, res) => {
+    const id = parseInt(req.params.id)
+    productos.deleteById(id)
+    res.send({msj: `Product with ID ${id} was deleted`})
 })
 
-//post (save) > api/productos
-routeProducts.post('/', middlewareAuth, async (req, res, next) => {
-    const getBody = req.body
-    getBody.timestamp = Date.now()
-    const newProductId = await newProduct.save(getBody)
-    
-    newProductId
-        ? res.status(200).json({"Success" : "Product successfully added with ID: " + newProductId})
-        : res.status(400).json({"Error": "Please verify the body content"})
+productosRuta.get('/:id', (req, res) => {
+    const id = parseInt(req.params.id)
+    productos.getById(id).then(response => {
+        res.send(response)
+    })
 })
 
-//Put > api/productos/:id
-routeProducts.put('/:id', middlewareAuth, async (req, res, save) => {
-    const getId = req.params.id
-    const getBody = req.body
-    const wasUpdated = await newProduct.updateById(getId, getBody)
-    
-    wasUpdated
-        ? res.status(200).json({"Success" : "Product updated successfully"})
-        : res.status(404).json({"Error": "Product/s doesn't exist"})
+productosRuta.put('/:id', async (req, res) => {
+    const id = parseInt(req.params.id)
+    const producto = await productos.getById(id)
+    const productoNuevo = {
+        id: id,
+        title: req.body.title,
+        price: req.body.price,
+        thumbnail: req.body.thumbnail
+    };
+    await productos.deleteById(id)
+    await productos.save(productoNuevo)
+    res.send({msj: `Product ${producto.title} has been updated`})
+}) 
+
+
+//Endpoints de carrito
+carritoRuta.post('/', async (req, res) => {
+    res.send(await carrito.save())
 })
 
-//Delete > /api/productos/:id
-routeProducts.delete('/:id', middlewareAuth, async (req, res, next) => {
-    const getId = req.params.id
-    const wasDeleted = await newProduct.deleteById(getId)
-    
-    wasDeleted 
-        ? res.status(200).json({"Success": "Product successfully removed"})
-        : res.status(404).json({"Error": "Product/s doesn't exist"})
-})  
-
-// CART >>>>>>
-//post (carrito) > /api/carrito
-routeCart.post('/', async(req, res) => {
-    const getBody = req.body
-    
-    getBody.timestamp = Date.now()
-    getBody.products = []
-    const newCartId = await newCart.save(getBody)
-    
-    newCartId
-        ? res.status(200).json({"Success" : "Product added to cart with ID: " + newCartId})
-        : res.status(400).json({"Error": "Please verify the body content"})
+carritoRuta.delete('/:id', async (req, res) => {
+    const id = parseInt(req.params.id)
+    res.send(await carrito.deleteById(id))
 })
 
-// POST /api/carrito/:id/productos
-routeCart.post('/:id/productos', async(req,res) => {
-    const { id } = req.params
-    const { body } = req
-    
-    const product = await newProduct.getById(body['id'])
-    
-    if (product) {
-        const cartExist = await newCart.addToCartById(id, {"products": product})
-        cartExist
-            ? res.status(200).json({"Success" : "Product was successfully added to cart"})
-            : res.status(404).json({"Error": "Please verify the body content"})
-    } else {
-        res.status(404).json({"Error": "Please verify the body content or ID"})
-    }
+carritoRuta.get('/:id/productos', async (req, res) => {
+    const id = parseInt(req.params.id)
+    res.send(await carrito.getById(id))
 })
 
-//delete (carrito) > /api/carrito/id
-routeCart.delete('/:id', async (req, res) => {
-    const getId = req.params.id
-    const wasDeleted = await newCart.deleteById(getId);
-    
-    wasDeleted 
-        ? res.status(200).json({"Success": "Cart was successfully removed."})
-        : res.status(404).json({"Error": "Cart doesn't exist"})
+carritoRuta.post('/:id/productos', async (req, res) => {
+    const id = parseInt(req.params.id)
+    const producto = req.body;
+    res.send(await carrito.saveProduct(id, producto))
 })
 
-//getCartProductsById /api/carrito/:id/productos
-routeCart.get('/:id/productos', async(req, res) => {
-    const getId = req.params.id
-    const cart = await newCart.getById(getId)
-    
-    cart
-        ? res.status(200).json(cart.products)
-        : res.status(404).json({"Error": "Cart doesn't exists"})
+carritoRuta.delete('/:id/productos/:idProd', async (req, res) => {
+    const idCarrito = parseInt(req.params.id)
+    const idProducto = parseInt(req.params.idProd)
+    res.send(await carrito.deleteProduct(idCarrito, idProducto))
 })
 
-//delete /api/carrito/:id/productos/:idProd
-routeCart.delete('/:id/productos/:idProd', async(req, res) => {
-    const {id, idProd } = req.params
-    const productExists = await newProduct.getById(idProd)
-    if (productExists) {
-        const cartExists = await newCart.removeFromCartById(id, idProd, 'products')
-        cartExists
-            ? res.status(200).json({"Success" : "Product was successfully removed from cart."})
-            : res.status(404).json({"Error": "Cart doesn't exists"})
-    } else {
-        res.status(404).json({"Error": "Product doesn't exists"})
-    }
-})
+//Manejo de errores
+app.use((req, res, next) => {
+    res.status(404).send({error: -2, descripcion: `Route ${req.url} method ${req.method} hasn't been implemented`});
+});
 
-//Server
-const server = app.listen(PORT, () => {
-    console.log(`Server listening: https://localhost:${server.address().port}`)
+const server = app.listen(PORT, ()=>{
+    console.log(`Server started at: http://localhost:${server.address().port}`)
 })
-
-server.on('error', error => console.log(`Error: ${error}`))
+server.on("error", error => console.log(error))

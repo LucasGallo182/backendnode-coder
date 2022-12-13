@@ -1,7 +1,7 @@
 {
-  "name": "desafio7",
+  "name": "desafio10",
   "version": "1.0.0",
-  "description": "primera entrega del proyecto final coder backend",
+  "description": "segunda entrega del proyecto final coder backend",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
